@@ -14,34 +14,37 @@ namespace PicasaStarter
         public void Registerbuttons()
         {
             // Retrieve buttons that are not shown in Picasa, but are registered already...
+            List<string> hiddenButtonIDs = new List<string>();
             string keyNameHiddenButtons = "Software\\Google\\Picasa\\Picasa2\\Preferences\\Buttons\\Exclude";
             
             RegistryKey keyHiddenButtons = Registry.CurrentUser.OpenSubKey(keyNameHiddenButtons);
-            string[] hiddenIndexes = keyHiddenButtons.GetValueNames();
-            List<string> hiddenButtonIDs = new List<string>(hiddenIndexes.Length);
+            if (keyHiddenButtons != null) {
+                string[] hiddenIndexes = keyHiddenButtons.GetValueNames();
 
-            for (int i = 0; i < hiddenIndexes.Length; i++)
-            {
-                hiddenButtonIDs.Add(keyHiddenButtons.GetValue(hiddenIndexes[i]).ToString());
+                for (int i = 0; i < hiddenIndexes.Length; i++)
+                {
+                    hiddenButtonIDs.Add(keyHiddenButtons.GetValue(hiddenIndexes[i]).ToString());
+                }
             }
 
             // Retrieve buttons that are shown already in Picasa
+            List<string> shownButtonIDs = new List<string>();
             string keyNameShownButtons = "Software\\Google\\Picasa\\Picasa2\\Preferences\\Buttons\\UserConfig";
-
-            RegistryKey keyShownButtons = Registry.CurrentUser.OpenSubKey(keyNameShownButtons);
-            string[] shownIndexes = keyShownButtons.GetValueNames();
-            List<string> shownButtonIDs = new List<string>(shownIndexes.Length);
-            int index = 0;
             int highestShownIndex = 0;
 
-            for (int i = 0; i < shownIndexes.Length; i++)
-            {
-                shownButtonIDs.Add(keyShownButtons.GetValue(shownIndexes[i]).ToString());
+            RegistryKey keyShownButtons = Registry.CurrentUser.OpenSubKey(keyNameShownButtons);
+            if (keyShownButtons != null) {
+                string[] shownIndexes = keyShownButtons.GetValueNames();
+                int index = 0;
 
-                // Find the highest index
-                int.TryParse(shownIndexes[i], out index);
-                if (index > highestShownIndex)
-                    highestShownIndex = index;
+                for (int i = 0; i < shownIndexes.Length; i++) {
+                    shownButtonIDs.Add(keyShownButtons.GetValue(shownIndexes[i]).ToString());
+
+                    // Find the highest index
+                    int.TryParse(shownIndexes[i], out index);
+                    if (index > highestShownIndex)
+                        highestShownIndex = index;
+                }
             }
 
             // Loop over all buttons and register them if needed...
